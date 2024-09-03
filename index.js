@@ -6,7 +6,7 @@ const moment = require("moment");
 const cookieParser = require('cookie-parser');
 const path = require("path");
 const cors = require('cors');
-const cronJobs = require('./cron/cronJob.js');
+const cronJobs = require('./cron/cronJobs.js');
 
 require("dotenv").config();
 
