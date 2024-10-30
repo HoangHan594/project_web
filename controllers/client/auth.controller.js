@@ -65,12 +65,12 @@ const requestPasswordReset = async(req, res) => {
         const transporter = nodemailer.createTransport({
             service: 'Gmail',
             auth: {
-                user: 'abc123@gmail.com',
-                pass: 'dwic wogl qjny imux',
+                user: 'nguyenhoanghan2003@gmail.com',
+                pass: 'rlzd jstj znda dadi',
             },
         });
         const mailOptions = {
-            from: 'abc123@gmail.com',
+            from: 'nguyenhoanghan2003@gmail.com',
             to: reader.email,
             subject: 'Password Reset',
             text: `You requested a password reset. Click the link below to reset your password:\n\n` +

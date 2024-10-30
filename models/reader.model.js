@@ -22,8 +22,17 @@ const readerSchema = new mongoose.Schema({
             default: 1,
             require: true,
         },
+        paymentMethod: String,
     }],
-    accountBalance: Number,
+    accountBalance: {
+        type: Number,
+        validate: {
+            validator: function(value) {
+                return !isNaN(value);
+            },
+            message: props => `${props.value} is not a valid number!`
+        }
+    },
     bankAccount: {
         accountNumber: String,
         bankName: String,

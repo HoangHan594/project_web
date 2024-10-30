@@ -12,6 +12,9 @@ const bookSchema = new mongoose.Schema({
     author: String,
     thumbnail: String,
     genre: String,
+    weight: String,
+    packagingSize: String,
+    pageNumber: Number,
     slug: {
         type: String,
         slug: "bookTitle",

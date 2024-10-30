@@ -7,6 +7,7 @@ const nodemailer = require('nodemailer');
 
 const create = asyncHandler(async(req, res) => {
     try {
+        console.log(req.body);
         req.body.token = generateString.generateRandomString(20);
         const user = await Reader.create(req.body);
         res.status(200).json(user);
@@ -57,6 +58,7 @@ const borrowBook = async(req, res) => {
                 borrowDate: req.body.borrow.borrowDate || "01/01/2024",
                 returnDate: req.body.borrow.returnDate || "31/12/2024",
                 quantity: req.body.borrow.quantity || 1,
+                paymentMethod: req.body.borrow.paymentMethod,
             };
 
             const readers = await Reader.find({});
@@ -96,6 +98,7 @@ const borrowBook = async(req, res) => {
                 existingBook.borrowDate = newBorrow.borrowDate || '01/01/2024';
                 existingBook.returnDate = newBorrow.returnDate || '31/12/2024';
                 existingBook.status = newBorrow.status || "processing";
+                existingBook.paymentMethod = newBorrow.paymentMethod;
             } else {
                 // Nếu chưa có quyển sách trong mảng borrow, thêm borrow vào mảng
                 reader.borrow.push(newBorrow);
@@ -287,9 +290,13 @@ const updateAccountBalance = asyncHandler(async(req, res) => {
             return res.status(401).json({ message: 'Unauthorized' });
         }
 
-        const { quantity } = req.body; // Lấy số lượng sách từ body
+        const { quantity, paymentMethod } = req.body; // Lấy số lượng và phương thức thanh toán từ body
         if (typeof quantity !== 'number' || quantity <= 0) {
             return res.status(400).json({ message: 'Invalid quantity provided' });
+        }
+
+        if (!paymentMethod || typeof paymentMethod !== 'string') {
+            return res.status(400).json({ message: 'Invalid or missing payment method' });
         }
 
         const reader = await Reader.findOne({ token: tokenUser });
@@ -297,23 +304,18 @@ const updateAccountBalance = asyncHandler(async(req, res) => {
             return res.status(404).json({ message: 'Reader not found' });
         }
 
-        const totalDeduction = 5000 * quantity;
-        if (reader.accountBalance < totalDeduction) {
-            return res.status(400).json({ message: 'Insufficient account balance' });
-        }
-
-        reader.accountBalance -= totalDeduction;
-        await reader.save();
-
+        // Không trừ tiền, chỉ cập nhật trạng thái thanh toán
         res.status(200).json({
-            message: 'Account balance updated successfully',
-            accountBalance: reader.accountBalance
+            message: 'Payment processed successfully',
+            quantity,
+            paymentMethod
         });
     } catch (error) {
         console.error('Update Account Balance failed:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
 
 module.exports = {
     create,
